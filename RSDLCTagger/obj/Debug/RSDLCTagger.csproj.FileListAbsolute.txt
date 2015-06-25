@@ -1,0 +1,15 @@
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\RSDLCTagger.exe
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\RSDLCTagger.pdb
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.csprojResolveAssemblyReference.cache
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.frmMain.resources
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.Properties.Resources.resources
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.csproj.GenerateResource.Cache
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.exe
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Debug\RSDLCTagger.pdb
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\Newtonsoft.Json.dll
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\RocksmithToolkitLib.dll
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\X360.dll
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\MiscUtil.dll
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\zlib.net.dll
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\Newtonsoft.Json.xml
+E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\bin\Debug\DevIL.NET.dll
