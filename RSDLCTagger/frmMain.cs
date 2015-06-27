@@ -71,8 +71,9 @@ namespace RSDLCTagger
                 {
                     string songAndFolderPath = new FileInfo(song).Directory.FullName.Replace(tbRSPath.Text + @"\", "").Replace(tbRSPath.Text, "");
                     string fileName = Path.GetFileName(song);
+                    var creationTime = File.GetCreationTime(song);
 
-                    if (song.Replace(".disabled", "").LastIndexOf("-") == song.Replace(".disabled", "").LastIndexOf("_p.") - 1)
+                    if (creationTime == new DateTime(1990, 1, 1) || song.Replace(".disabled", "").LastIndexOf("-") == song.Replace(".disabled", "").LastIndexOf("_p.") - 1)
                         dgvSongs.Rows.Add(false, "Yes", Path.Combine(songAndFolderPath, fileName));
                     else
                         dgvSongs.Rows.Add(false, "No", Path.Combine(songAndFolderPath, fileName));
