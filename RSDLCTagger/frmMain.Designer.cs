@@ -61,6 +61,7 @@
             this.colTagged = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ambiance_ControlBox1 = new Ambiance.Ambiance_ControlBox();
+            this.tbThemeLegend = new System.Windows.Forms.TextBox();
             this.themeContainerMain.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).BeginInit();
@@ -97,7 +98,7 @@
             this.themeContainerMain.Padding = new System.Windows.Forms.Padding(20, 56, 20, 16);
             this.themeContainerMain.RoundCorners = true;
             this.themeContainerMain.Sizable = true;
-            this.themeContainerMain.Size = new System.Drawing.Size(695, 719);
+            this.themeContainerMain.Size = new System.Drawing.Size(700, 759);
             this.themeContainerMain.SmartBounds = true;
             this.themeContainerMain.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultLocation;
             this.themeContainerMain.TabIndex = 0;
@@ -105,13 +106,14 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.tbThemeLegend);
             this.groupBox2.Controls.Add(this.btnSavePreview);
             this.groupBox2.Controls.Add(this.lblTagPacks);
             this.groupBox2.Controls.Add(this.comboTagPacks);
             this.groupBox2.Controls.Add(this.pictureBoxPreview);
             this.groupBox2.Location = new System.Drawing.Point(62, 493);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(570, 155);
+            this.groupBox2.Size = new System.Drawing.Size(571, 217);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tag packs";
@@ -122,7 +124,7 @@
             this.btnSavePreview.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnSavePreview.Image = null;
             this.btnSavePreview.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSavePreview.Location = new System.Drawing.Point(80, 95);
+            this.btnSavePreview.Location = new System.Drawing.Point(83, 72);
             this.btnSavePreview.Name = "btnSavePreview";
             this.btnSavePreview.Size = new System.Drawing.Size(177, 30);
             this.btnSavePreview.TabIndex = 23;
@@ -136,7 +138,7 @@
             this.lblTagPacks.BackColor = System.Drawing.Color.Transparent;
             this.lblTagPacks.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.lblTagPacks.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(77)))));
-            this.lblTagPacks.Location = new System.Drawing.Point(135, 40);
+            this.lblTagPacks.Location = new System.Drawing.Point(134, 17);
             this.lblTagPacks.Name = "lblTagPacks";
             this.lblTagPacks.Size = new System.Drawing.Size(75, 20);
             this.lblTagPacks.TabIndex = 22;
@@ -154,12 +156,7 @@
             this.comboTagPacks.HoverSelectionColor = System.Drawing.Color.Empty;
             this.comboTagPacks.IntegralHeight = false;
             this.comboTagPacks.ItemHeight = 20;
-            this.comboTagPacks.Items.AddRange(new object[] {
-            "Frack-default pack",
-            "Motive #1 pack ",
-            "Motive #2 pack",
-            "Motive #3 pack"});
-            this.comboTagPacks.Location = new System.Drawing.Point(57, 63);
+            this.comboTagPacks.Location = new System.Drawing.Point(53, 40);
             this.comboTagPacks.Name = "comboTagPacks";
             this.comboTagPacks.Size = new System.Drawing.Size(237, 26);
             this.comboTagPacks.StartIndex = 1;
@@ -168,7 +165,7 @@
             // 
             // pictureBoxPreview
             // 
-            this.pictureBoxPreview.Location = new System.Drawing.Point(370, 17);
+            this.pictureBoxPreview.Location = new System.Drawing.Point(378, 40);
             this.pictureBoxPreview.Name = "pictureBoxPreview";
             this.pictureBoxPreview.Size = new System.Drawing.Size(128, 128);
             this.pictureBoxPreview.TabIndex = 20;
@@ -299,7 +296,7 @@
             this.lblSearch.BackColor = System.Drawing.Color.Transparent;
             this.lblSearch.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.lblSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(77)))));
-            this.lblSearch.Location = new System.Drawing.Point(216, 179);
+            this.lblSearch.Location = new System.Drawing.Point(225, 179);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(56, 20);
             this.lblSearch.TabIndex = 13;
@@ -310,12 +307,12 @@
             this.tbSearch.BackColor = System.Drawing.Color.Transparent;
             this.tbSearch.Font = new System.Drawing.Font("Tahoma", 11F);
             this.tbSearch.ForeColor = System.Drawing.Color.DimGray;
-            this.tbSearch.Location = new System.Drawing.Point(272, 175);
+            this.tbSearch.Location = new System.Drawing.Point(287, 175);
             this.tbSearch.MaxLength = 32767;
             this.tbSearch.Multiline = false;
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.ReadOnly = false;
-            this.tbSearch.Size = new System.Drawing.Size(177, 28);
+            this.tbSearch.Size = new System.Drawing.Size(171, 28);
             this.tbSearch.TabIndex = 12;
             this.tbSearch.TextAlignment = System.Windows.Forms.HorizontalAlignment.Left;
             this.tbSearch.UseSystemPasswordChar = false;
@@ -327,7 +324,7 @@
             this.btnLoadSongs.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnLoadSongs.Image = null;
             this.btnLoadSongs.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLoadSongs.Location = new System.Drawing.Point(477, 175);
+            this.btnLoadSongs.Location = new System.Drawing.Point(478, 175);
             this.btnLoadSongs.Name = "btnLoadSongs";
             this.btnLoadSongs.Size = new System.Drawing.Size(155, 30);
             this.btnLoadSongs.TabIndex = 11;
@@ -341,9 +338,9 @@
             this.statusLblMain,
             this.statusLblMiddle,
             this.statusLblTagged});
-            this.statusStripMain.Location = new System.Drawing.Point(20, 681);
+            this.statusStripMain.Location = new System.Drawing.Point(20, 721);
             this.statusStripMain.Name = "statusStripMain";
-            this.statusStripMain.Size = new System.Drawing.Size(655, 22);
+            this.statusStripMain.Size = new System.Drawing.Size(660, 22);
             this.statusStripMain.TabIndex = 10;
             // 
             // statusLblMain
@@ -355,7 +352,7 @@
             // statusLblMiddle
             // 
             this.statusLblMiddle.Name = "statusLblMiddle";
-            this.statusLblMiddle.Size = new System.Drawing.Size(411, 17);
+            this.statusLblMiddle.Size = new System.Drawing.Size(416, 17);
             this.statusLblMiddle.Spring = true;
             // 
             // statusLblTagged
@@ -398,7 +395,7 @@
             this.btnRunRS.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnRunRS.Image = null;
             this.btnRunRS.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnRunRS.Location = new System.Drawing.Point(257, 135);
+            this.btnRunRS.Location = new System.Drawing.Point(260, 135);
             this.btnRunRS.Name = "btnRunRS";
             this.btnRunRS.Size = new System.Drawing.Size(177, 30);
             this.btnRunRS.TabIndex = 5;
@@ -440,7 +437,7 @@
             // 
             this.colPath.HeaderText = "Short Path";
             this.colPath.Name = "colPath";
-            this.colPath.Width = 395;
+            this.colPath.Width = 397;
             // 
             // ambiance_ControlBox1
             // 
@@ -453,11 +450,20 @@
             this.ambiance_ControlBox1.TabIndex = 0;
             this.ambiance_ControlBox1.Text = "ambiance_ControlBox1";
             // 
+            // tbThemeLegend
+            // 
+            this.tbThemeLegend.Enabled = false;
+            this.tbThemeLegend.Location = new System.Drawing.Point(25, 108);
+            this.tbThemeLegend.Multiline = true;
+            this.tbThemeLegend.Name = "tbThemeLegend";
+            this.tbThemeLegend.Size = new System.Drawing.Size(299, 103);
+            this.tbThemeLegend.TabIndex = 24;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(695, 719);
+            this.ClientSize = new System.Drawing.Size(700, 759);
             this.Controls.Add(this.themeContainerMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -505,15 +511,16 @@
         private Ambiance.Ambiance_CheckBox checkDeleteExtractedOnDone;
         private Ambiance.Ambiance_Label lblRSPath;
         private Ambiance.Ambiance_TextBox tbRSPath;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn colSelect;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colTagged;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colPath;
         private System.Windows.Forms.GroupBox groupBox2;
         private Ambiance.Ambiance_Label lblTagPacks;
         private Ambiance.Ambiance_ComboBox comboTagPacks;
         private System.Windows.Forms.PictureBox pictureBoxPreview;
         private Ambiance.Ambiance_Button_1 btnSavePreview;
         private System.Windows.Forms.SaveFileDialog sfdPreview;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colSelect;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTagged;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPath;
+        private System.Windows.Forms.TextBox tbThemeLegend;
     }
 }
 
