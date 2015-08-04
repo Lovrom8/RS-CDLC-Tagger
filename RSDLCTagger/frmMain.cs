@@ -16,11 +16,14 @@ using System.Drawing.Imaging;
 using RocksmithToolkitLib.Extensions;
 using RSDLCTagger.lib;
 using System.Drawing.Drawing2D;
+using System.Threading;
+using Newtonsoft.Json.Linq;
 
 namespace RSDLCTagger
 {
     public partial class frmMain : Form
     {
+        Stopwatch stopWatch = new Stopwatch();
         private Settings mySettings;
         private List<string> SongCollection = new List<string>();
 
@@ -33,6 +36,8 @@ namespace RSDLCTagger
         string albumMidArtPath = "";
         string albumBigArtPath = "";
         string tagsFolder = "frackDefault";
+        string taggedPreviewPath = "";
+        string cleanPreviewPath = "";
 
         Bitmap smallAlbumArt;
         Bitmap midAlbumArt;
@@ -46,6 +51,7 @@ namespace RSDLCTagger
         bool bonusLead = false;
         bool bonusRhythm = false;
         bool bonusBass = false;
+        bool DD = false;
         bool allSelected = false;
 
         public frmMain()
@@ -79,14 +85,17 @@ namespace RSDLCTagger
                 SongCollection = Directory.EnumerateFiles(Path.Combine(tbRSPath.Text, "dlc"), "*_p.*psarc", SearchOption.AllDirectories).ToList();
                 foreach (string song in SongCollection.Where(sng => sng.ToLower().Contains(searchCondition.ToLower())))
                 {
-                    string songAndFolderPath = new FileInfo(song).Directory.FullName.Replace(tbRSPath.Text + @"\", "").Replace(tbRSPath.Text, "");
-                    string fileName = Path.GetFileName(song);
-                    var creationTime = File.GetCreationTime(song);
+                    if (!song.Contains("rs1"))
+                    {
+                        string songAndFolderPath = new FileInfo(song).Directory.FullName.Replace(tbRSPath.Text + @"\", "").Replace(tbRSPath.Text, "");
+                        string fileName = Path.GetFileName(song);
+                        var creationTime = File.GetCreationTime(song);
 
-                    if (creationTime == new DateTime(1990, 1, 1) || song.Replace(".disabled", "").LastIndexOf("-") == song.Replace(".disabled", "").LastIndexOf("_p.") - 1)
-                        dgvSongs.Rows.Add(false, "Yes", Path.Combine(songAndFolderPath, fileName));
-                    else
-                        dgvSongs.Rows.Add(false, "No", Path.Combine(songAndFolderPath, fileName));
+                        if (creationTime == new DateTime(1990, 1, 1) || song.Replace(".disabled", "").LastIndexOf("-") == song.Replace(".disabled", "").LastIndexOf("_p.") - 1)
+                            dgvSongs.Rows.Add(false, "Yes", Path.Combine(songAndFolderPath, fileName));
+                        else
+                            dgvSongs.Rows.Add(false, "No", Path.Combine(songAndFolderPath, fileName));
+                    }
                 }
             }
         }
@@ -194,6 +203,26 @@ namespace RSDLCTagger
             return destImage;
         }
 
+        private bool HasDD(string arrangementPath)
+        {
+            string songFileContent = File.ReadAllText(arrangementPath);
+            var o = JObject.Parse(songFileContent);
+            var attributes = o["Entries"].First.Last["Attributes"];
+
+            if (attributes["MaxPhraseDifficulty"].ToString() != "0")
+                return true;
+            else
+                return false;
+        }
+
+        private void ClearDirectory(string dirPath)
+        {
+            var dir = new DirectoryInfo(dirPath);
+
+            dir.EnumerateFiles().ToList().ForEach(f => f.Delete());
+            dir.EnumerateDirectories().ToList().ForEach(d => d.Delete(true));
+        }
+
         private void btnRunRS_Click(object sender, EventArgs e)
         {
             var rocksmithProcess = Process.GetProcessesByName("Rocksmith2014.exe");
@@ -226,6 +255,7 @@ namespace RSDLCTagger
                     bgWorker = new BackgroundWorker();
                     bgWorker.DoWork += delegate
                     {
+                        bool overwriteTags = checkOverwriteTagsOnTaggedSongs.Checked;
                         dgvSongs.InvokeIfRequired(delegate
                         {
                             songCount = dgvSongs.Rows.Cast<DataGridViewRow>().Where(row => ((Convert.ToBoolean(row.Cells["colSelect"].Value)) || row.Selected)).ToList().Count();
@@ -238,187 +268,212 @@ namespace RSDLCTagger
 
                         foreach (DataGridViewRow song in dgvSongs.Rows)
                         {
-                            if (((Convert.ToBoolean(song.Cells["colSelect"].Value)) || song.Selected))
+                            bool songTagged = song.Cells["colTagged"].Value.ToString() == "Yes" ? true : false;
+                            if ((Convert.ToBoolean(song.Cells["colSelect"].Value) || song.Selected))
                             {
-                                pathExtension = "_";
-
-                                string songPath = Path.Combine(tbRSPath.Text, song.Cells["colPath"].Value.ToString());
-
-                                songExtractedPath = Path.Combine(tbWorkingFolderPath.Text, Path.GetFileName(songPath.Replace(".psarc", "_Pc")));
-                                manifestsFolderPath = Path.Combine(songExtractedPath, "manifests");
-                                albumArtFolderPath = Path.Combine(songExtractedPath, "gfxassets", "album_art");
-                                toolkitVersionFilePath = Path.Combine(songExtractedPath, "toolkit.version");
-
-                                Packer.Unpack(songPath, tbWorkingFolderPath.Text);
-
-                                if (File.Exists(toolkitVersionFilePath))
+                                if (!songTagged || (songTagged && overwriteTags))
                                 {
-                                    albumSmallArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*64.dds").ToList()[0];
-                                    albumMidArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*128.dds").ToList()[0];
-                                    albumBigArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*256.dds").ToList()[0];
+                                    pathExtension = "_";
 
-                                    albumArtDDS = new DDSImage(File.ReadAllBytes(albumBigArtPath));
-                                    bigAlbumArt = albumArtDDS.images[0];
+                                    string songPath = Path.Combine(tbRSPath.Text, song.Cells["colPath"].Value.ToString());
 
-                                    midAlbumArt = ResizeImage(bigAlbumArt, 128, 128);
-                                    smallAlbumArt = ResizeImage(bigAlbumArt, 64, 64);
+                                    songExtractedPath = Path.Combine(tbWorkingFolderPath.Text, Path.GetFileName(songPath.Replace(".psarc", "_Pc")));
+                                    manifestsFolderPath = Path.Combine(songExtractedPath, "manifests");
+                                    albumArtFolderPath = Path.Combine(songExtractedPath, "gfxassets", "album_art");
+                                    toolkitVersionFilePath = Path.Combine(songExtractedPath, "toolkit.version");
+                                    taggedPreviewPath = Path.Combine(tbWorkingFolderPath.Text, "previews", Path.GetFileName(songPath.Replace("_p.psarc", "")) + "_tagged.png");
+                                    cleanPreviewPath = Path.Combine(tbWorkingFolderPath.Text, "previews", Path.GetFileName(songPath.Replace("_p.psarc", "")) + "_clean.png");
 
-                                    //Check which arrangements it contains
-                                    lead = false;
-                                    rhythm = false;
-                                    bass = false;
-                                    vocals = false;
-                                    bonusLead = false;
-                                    bonusRhythm = false;
-                                    bonusBass = false;
+                                    Packer.Unpack(songPath, tbWorkingFolderPath.Text);
 
-                                    var arrangements = Directory.EnumerateFiles(manifestsFolderPath, "*.json", SearchOption.AllDirectories);
-
-                                    foreach (string arrangement in arrangements)
+                                    if (File.Exists(toolkitVersionFilePath))
                                     {
-                                        // arrangement.Substring(arrangement.LastIndexOf("_") + 1, arrangement.Length - arrangement.LastIndexOf(".") + 1);
-                                        if (arrangement.Contains("lead") && !arrangement.Contains("lead2"))
-                                        {
-                                            lead = true;
-                                            pathExtension += "L";
-                                        }
-                                        if (arrangement.Contains("lead2"))
-                                        {
-                                            bonusLead = true;
-                                            pathExtension += "l";
-                                        }
-                                        if (arrangement.Contains("rhythm") && !arrangement.Contains("rhythm2"))
-                                        {
-                                            rhythm = true;
-                                            pathExtension += "R";
-                                        }
-                                        if (arrangement.Contains("rhythm2"))
-                                        {
-                                            bonusRhythm = true;
-                                            pathExtension = "r";
-                                        }
-                                        if (arrangement.Contains("bass") && !arrangement.Contains("bass2"))
-                                        {
-                                            bass = true;
-                                            pathExtension += "B";
-                                        }
-                                        if (arrangement.Contains("bass2"))
-                                        {
-                                            bonusBass = true;
-                                            pathExtension += "b";
-                                        }
-                                        if (arrangement.Contains("vocals"))
-                                        {
-                                            vocals = true;
-                                            pathExtension += "V";
-                                        }
-                                    }
+                                        albumSmallArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*64.dds").ToList()[0];
+                                        albumMidArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*128.dds").ToList()[0];
+                                        albumBigArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*256.dds").ToList()[0];
 
-                                    //Add layers to big album art
-                                    using (Graphics gra = Graphics.FromImage(midAlbumArt))
+                                        albumArtDDS = new DDSImage(File.ReadAllBytes(albumBigArtPath));
+                                        bigAlbumArt = albumArtDDS.images[0];
+
+                                        midAlbumArt = ResizeImage(bigAlbumArt, 128, 128);
+                                        smallAlbumArt = ResizeImage(bigAlbumArt, 64, 64);
+
+                                        if (!Directory.Exists(Path.Combine(tbWorkingFolderPath.Text, "previews")))
+                                            Directory.CreateDirectory(Path.Combine(tbWorkingFolderPath.Text, "previews"));
+
+                                        midAlbumArt.Save("albumMidArt.png", ImageFormat.Png);
+                                        File.Copy("albumMidArt.png", cleanPreviewPath, true);
+                                        File.Delete("albumMidArt.png");
+
+                                        //Check which arrangements it contains
+                                        lead = false;
+                                        rhythm = false;
+                                        bass = false;
+                                        vocals = false;
+                                        bonusLead = false;
+                                        bonusRhythm = false;
+                                        bonusBass = false;
+                                        DD = false;
+
+                                        var arrangements = Directory.EnumerateFiles(manifestsFolderPath, "*.json", SearchOption.AllDirectories);
+
+                                        foreach (string arrangement in arrangements)
+                                        {
+                                            // arrangement.Substring(arrangement.LastIndexOf("_") + 1, arrangement.Length - arrangement.LastIndexOf(".") + 1);
+                                            if (arrangement.Contains("lead") && !arrangement.Contains("lead2"))
+                                            {
+                                                lead = true;
+                                                pathExtension += "L";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("lead2"))
+                                            {
+                                                bonusLead = true;
+                                                pathExtension += "l";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("rhythm") && !arrangement.Contains("rhythm2"))
+                                            {
+                                                rhythm = true;
+                                                pathExtension += "R";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("rhythm2"))
+                                            {
+                                                bonusRhythm = true;
+                                                pathExtension = "r";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("bass") && !arrangement.Contains("bass2"))
+                                            {
+                                                bass = true;
+                                                pathExtension += "B";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("bass2"))
+                                            {
+                                                bonusBass = true;
+                                                pathExtension += "b";
+                                                if (!DD)
+                                                    DD = HasDD(arrangement);
+                                            }
+                                            if (arrangement.Contains("vocals"))
+                                            {
+                                                vocals = true;
+                                                pathExtension += "V";
+                                            }
+                                        }
+
+                                        //Add layers to big album art
+                                        using (Graphics gra = Graphics.FromImage(midAlbumArt))
+                                        {
+                                            gra.DrawImage(backgroundLayer, 0, 0.5f);
+                                            if (vocals)
+                                                gra.DrawImage(vocalLayer, 0, 0.5f);
+                                            if (bass)
+                                                gra.DrawImage(bassLayer, 0, 0.5f);
+                                            if (bonusBass)
+                                                gra.DrawImage(bassBonusLayer, 0, 0.5f);
+                                            if (rhythm)
+                                                gra.DrawImage(rhythmLayer, 0, 0.5f);
+                                            if (bonusRhythm)
+                                                gra.DrawImage(rhythmBonusLayer, 0, 0.5f);
+                                            if (lead)
+                                                gra.DrawImage(leadLayer, 0, 0.5f);
+                                            if (bonusLead)
+                                                gra.DrawImage(leadBonusLayer, 0, 0.5f);
+                                            gra.DrawImage(customTagLayer, 0, 0.5f);
+                                        }
+
+                                        //Draw layers to small album art
+                                        using (Graphics gra = Graphics.FromImage(smallAlbumArt))
+                                        {
+                                            gra.DrawImage(new Bitmap(backgroundLayer, backgroundLayer.Width / 2, backgroundLayer.Height / 2), 0, 1.0f);
+                                            if (vocals)
+                                                gra.DrawImage(new Bitmap(vocalLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (bass)
+                                                gra.DrawImage(new Bitmap(bassLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (bonusBass)
+                                                gra.DrawImage(new Bitmap(bassBonusLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (rhythm)
+                                                gra.DrawImage(new Bitmap(rhythmLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (bonusRhythm)
+                                                gra.DrawImage(new Bitmap(rhythmLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (lead)
+                                                gra.DrawImage(new Bitmap(leadLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            if (bonusLead)
+                                                gra.DrawImage(new Bitmap(leadBonusLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
+                                            gra.DrawImage(new Bitmap(customTagLayer, customTagLayer.Width / 2, customTagLayer.Height / 2), 0, 1.0f);
+                                        }
+
+                                        //Delete existing album art
+                                        if (File.Exists(albumMidArtPath))
+                                            File.Delete(albumMidArtPath);
+
+                                        if (File.Exists(albumSmallArtPath))
+                                            File.Delete(albumSmallArtPath);
+
+                                        //Save modified album art
+                                        midAlbumArt.Save("albumMidArt.png", ImageFormat.Png);
+
+                                        ExternalApps.Png2Dds("albumMidArt.png", albumMidArtPath, 128, 128);
+                                        File.Copy("albumMidArt.png", taggedPreviewPath, true);
+
+                                        File.Delete("albumMidArt.png");
+
+                                        smallAlbumArt.Save("albumSmallArt.png", ImageFormat.Png);
+
+                                        ExternalApps.Png2Dds("albumSmallArt.png", albumSmallArtPath, 64, 64);
+
+                                        File.Delete("albumSmallArt.png");
+
+                                        // Delete existing song & repack it
+                                        if (File.Exists(songPath))
+                                            File.Delete(songPath);
+
+                                        var songVar = SongCollection.FirstOrDefault(sng => sng == songPath);
+
+                                        //Add file name tags if the checkbox is checked
+                                        if (checkAddTagsToFileName.Checked)
+                                            songPath = songPath.Replace("_p.", pathExtension + "_p.");
+
+                                        Packer.Pack(songExtractedPath, songPath);
+                                        File.SetCreationTime(songPath, new DateTime(1990, 1, 1));
+
+                                        counter += 1;
+                                        statusLblTagged.Text = "Tagged: " + counter + "/" + songCount;
+
+                                        songVar = songPath;
+
+                                        string songAndFolderPath = new FileInfo(songPath).Directory.FullName.Replace(tbRSPath.Text + @"\", "").Replace(tbRSPath.Text, "");
+                                        string fileName = Path.GetFileName(songPath);
+
+                                        songPath = Path.Combine(songAndFolderPath, fileName);
+
+                                        song.Cells["colTagged"].Value = "Yes";
+                                        song.Cells["colPath"].Value = songPath;
+
+                                        //Delete extracted folders if needed
+                                        if (checkDeleteExtractedOnDone.Checked)
+                                            Directory.Delete(songExtractedPath, true);
+                                    }
+                                    else
                                     {
-                                        gra.DrawImage(backgroundLayer, 0, 0.5f);
-                                        if (vocals)
-                                            gra.DrawImage(vocalLayer, 0, 0.5f);
-                                        if (bass)
-                                            gra.DrawImage(bassLayer, 0, 0.5f);
-                                        if (bonusBass)
-                                            gra.DrawImage(bassBonusLayer, 0, 0.5f);
-                                        if (rhythm)
-                                            gra.DrawImage(rhythmLayer, 0, 0.5f);
-                                        if (bonusRhythm)
-                                            gra.DrawImage(rhythmBonusLayer, 0, 0.5f);
-                                        if (lead)
-                                            gra.DrawImage(leadLayer, 0, 0.5f);
-                                        if (bonusLead)
-                                            gra.DrawImage(leadBonusLayer, 0, 0.5f);
-                                        gra.DrawImage(customTagLayer, 0, 0.5f);
-                                    }
-
-                                    //Draw layers to small album art
-                                    using (Graphics gra = Graphics.FromImage(smallAlbumArt))
-                                    {
-                                        gra.DrawImage(new Bitmap(backgroundLayer, backgroundLayer.Width / 2, backgroundLayer.Height / 2), 0, 1.0f);
-                                        if (vocals)
-                                            gra.DrawImage(new Bitmap(vocalLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (bass)
-                                            gra.DrawImage(new Bitmap(bassLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (bonusBass)
-                                            gra.DrawImage(new Bitmap(bassBonusLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (rhythm)
-                                            gra.DrawImage(new Bitmap(rhythmLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (bonusRhythm)
-                                            gra.DrawImage(new Bitmap(rhythmLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (lead)
-                                            gra.DrawImage(new Bitmap(leadLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        if (bonusLead)
-                                            gra.DrawImage(new Bitmap(leadBonusLayer, vocalLayer.Width / 2, vocalLayer.Height / 2), 0, 1.0f);
-                                        gra.DrawImage(new Bitmap(customTagLayer, customTagLayer.Width / 2, customTagLayer.Height / 2), 0, 1.0f);
-                                    }
-
-                                    //Delete existing album art
-                                    if (File.Exists(albumMidArtPath))
-                                        File.Delete(albumMidArtPath);
-
-                                    if (File.Exists(albumSmallArtPath))
-                                        File.Delete(albumSmallArtPath);
-
-                                    //Save modified album art
-                                    albumArtDDS.images[0] = midAlbumArt;
-                                    albumArtDDS.images[0].Save("albumMidArt.png", ImageFormat.Png);
-
-                                    ExternalApps.Png2Dds("albumMidArt.png", albumMidArtPath, 128, 128);
-
-                                    File.Delete("albumMidArt.png");
-
-                                    albumArtDDS.images[0] = smallAlbumArt;
-                                    albumArtDDS.images[0].Save("albumSmallArt.png", ImageFormat.Png);
-
-                                    ExternalApps.Png2Dds("albumSmallArt.png", albumSmallArtPath, 64, 64);
-
-                                    File.Delete("albumSmallArt.png");
-
-                                    // Delete existing song & repack it
-                                    if (File.Exists(songPath))
-                                        File.Delete(songPath);
-
-                                    var songVar = SongCollection.FirstOrDefault(sng => sng == songPath);
-
-                                    //Add file name tags if the checkbox is checked
-                                    if (checkAddTagsToFileName.Checked)
-                                        songPath = songPath.Replace("_p.", pathExtension + "_p.");
-
-                                    Packer.Pack(songExtractedPath, songPath);
-                                    File.SetCreationTime(songPath, new DateTime(1990, 1, 1));
-
-                                    counter += 1;
-                                    statusLblTagged.Text = "Tagged: " + counter + "/" + songCount;
-
-                                    songVar = songPath;
-
-                                    string songAndFolderPath = new FileInfo(songPath).Directory.FullName.Replace(tbRSPath.Text + @"\", "").Replace(tbRSPath.Text, "");
-                                    string fileName = Path.GetFileName(songPath);
-
-                                    songPath = Path.Combine(songAndFolderPath, fileName);
-
-                                    song.Cells["colTagged"].Value = "Yes";
-                                    song.Cells["colPath"].Value = songPath;
-                                }
-                                //Delete extracted folders if needed
-                                try
-                                {
-                                    if (checkDeleteExtractedOnDone.Checked)
                                         Directory.Delete(songExtractedPath, true);
-                                }
-                                catch (IOException ex)
-                                {
-                                    MessageBox.Show("Error: \n\n" + ex.Message.ToString(), "IO Error");
+                                        songCount -= 1;
+                                    }
                                 }
                             }
                         }
-                        if (songCount > 0)
+                        if (counter > 0 && songCount > 0)
                         {
                             MessageBox.Show("Tagging finished!", "Done");
+                            statusLblTagged.Text = "Tagging finished!";
                         }
                     };
                     bgWorker.RunWorkerAsync();
@@ -504,6 +559,7 @@ namespace RSDLCTagger
                                 manifestsFolderPath = Path.Combine(songExtractedPath, "manifests");
                                 albumArtFolderPath = Path.Combine(songExtractedPath, "gfxassets", "album_art");
                                 toolkitVersionFilePath = Path.Combine(songExtractedPath, "toolkit.version");
+                                taggedPreviewPath = Path.Combine(tbWorkingFolderPath.Text, "previews", Path.GetFileName(songPath.Replace("_p.psarc", "")) + "_tagged.png");
 
                                 Packer.Unpack(songPath, tbWorkingFolderPath.Text);
 
@@ -532,6 +588,9 @@ namespace RSDLCTagger
 
                                     ExternalApps.Png2Dds("albumMidArt.png", albumMidArtPath, 128, 128);
 
+                                    if (!Directory.Exists(Path.Combine(tbWorkingFolderPath.Text, "previews")))
+                                        Directory.CreateDirectory(Path.Combine(tbWorkingFolderPath.Text, "previews"));
+                                    File.Copy("albumMidArt.png", taggedPreviewPath, true);
                                     File.Delete("albumMidArt.png");
 
                                     albumArtDDS.images[0] = smallAlbumArt;
@@ -582,11 +641,14 @@ namespace RSDLCTagger
                                     if (checkDeleteExtractedOnDone.Checked)
                                         Directory.Delete(songExtractedPath, true);
                                 }
+                                else
+                                    songCount -= 1;
                             }
                         }
-                        if (songCount > 0)
+                        if (counter > 0 && songCount > 0)
                         {
                             MessageBox.Show("Removing tags finished!", "Done");
+                            statusLblTagged.Text = "Removing tags finished!";
                         }
                     };
                     bgWorker.RunWorkerAsync();
@@ -617,7 +679,122 @@ namespace RSDLCTagger
 
         private void dgvSongs_SelectionChanged(object sender, EventArgs e)
         {
+            if (dgvSongs.SelectedRows.Count > 0)
+            {
+                string taggedPreviewPath = Path.Combine(tbWorkingFolderPath.Text, "previews", dgvSongs.SelectedRows[0].Cells["colPath"].Value.ToString().Replace("dlc\\", "").Replace("_p.psarc", "") + "_tagged.png");
+                string cleanPreviewPath = taggedPreviewPath.Replace("_tagged", "_clean");
 
+                if (File.Exists(taggedPreviewPath))
+                {
+                    using (FileStream fs = new FileStream(taggedPreviewPath, FileMode.Open))
+                    {
+                        pictureBoxPreview.Image = Image.FromStream(fs);
+                    }
+                }
+                else if (File.Exists(cleanPreviewPath))
+                {
+                    using (FileStream fs = new FileStream(cleanPreviewPath, FileMode.Open))
+                    {
+                        pictureBoxPreview.Image = Image.FromStream(fs);
+                    }
+                }
+                else
+                {
+                    if (stopWatch.Elapsed.Seconds < 1)
+                    {
+                        try
+                        {
+                            if (DirOK())
+                            {
+                                ThreadPool.QueueUserWorkItem(delegate
+                                  {
+                                      string songPath = Path.Combine(tbRSPath.Text, dgvSongs.SelectedRows[0].Cells["colPath"].Value.ToString());
+
+                                      songExtractedPath = Path.Combine(tbWorkingFolderPath.Text, Path.GetFileName(songPath.Replace(".psarc", "_Pc")));
+                                      manifestsFolderPath = Path.Combine(songExtractedPath, "manifests");
+                                      albumArtFolderPath = Path.Combine(songExtractedPath, "gfxassets", "album_art");
+                                      toolkitVersionFilePath = Path.Combine(songExtractedPath, "toolkit.version");
+                                      cleanPreviewPath = Path.Combine(tbWorkingFolderPath.Text, "previews", Path.GetFileName(songPath.Replace("_p.psarc", "")) + "_clean.png");
+
+                                      try
+                                      {
+                                          if (Directory.Exists(songExtractedPath))
+                                          {
+                                              ClearDirectory(songExtractedPath);
+                                              Directory.Delete(songExtractedPath, true);
+                                          }
+                                          Packer.Unpack(songPath, tbWorkingFolderPath.Text);
+                                      }
+                                      catch (IOException ex)
+                                      {
+                                          MessageBox.Show(ex.Message.ToString(), "Extracting error");
+                                      }
+
+                                      if (File.Exists(toolkitVersionFilePath))
+                                      {
+                                          albumMidArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*128.dds").ToList()[0];
+                                          albumBigArtPath = Directory.EnumerateFiles(albumArtFolderPath, "*256.dds").ToList()[0];
+
+                                          albumArtDDS = new DDSImage(File.ReadAllBytes(albumBigArtPath));
+                                          bigAlbumArt = albumArtDDS.images[0];
+
+                                          midAlbumArt = ResizeImage(bigAlbumArt, 128, 128);
+
+                                          if (File.Exists(cleanPreviewPath))
+                                              File.Delete(cleanPreviewPath);
+                                          if (!Directory.Exists(Path.Combine(tbWorkingFolderPath.Text, "previews")))
+                                              Directory.CreateDirectory(Path.Combine(tbWorkingFolderPath.Text, "previews"));
+
+                                          var imgToSave = midAlbumArt;
+                                          imgToSave.Save(cleanPreviewPath, ImageFormat.Png);
+
+                                          pictureBoxPreview.Image = midAlbumArt;
+
+                                          if (checkDeleteExtractedOnDone.Checked)
+                                          {
+                                              if (Directory.Exists(songExtractedPath))
+                                              {
+                                                  ClearDirectory(songExtractedPath);
+                                                  Directory.Delete(songExtractedPath, true);
+                                              }
+                                          }
+                                      }
+                                      else
+                                      {
+                                          if (Directory.Exists(songExtractedPath))
+                                          {
+                                              ClearDirectory(songExtractedPath);
+                                              Directory.Delete(songExtractedPath, true);
+                                          }
+                                      }
+                                  });
+                            }
+                        }
+                        catch (IOException ex)
+                        {
+                            MessageBox.Show("Error: \n\n" + ex.Message.ToString(), "IO Error");
+                        }
+                        catch (ArgumentException)
+                        {
+                            MessageBox.Show("Make sure that you have all required files in the app folder: \n" +
+                                            "-nvdxt.exe \n" +
+                                            "-Newtonsoft.Json.dll \n" +
+                                            "-RocksmithTookitLib.dll \n" +
+                                            "-X360.dll \n" +
+                                            "-zlib.net.dll \n" +
+                                            "-MiscUtil.dll \n" +
+                                            "-tags/" + tagsFolder + "/Background.png \n" +
+                                            "-tags/" + tagsFolder + "/Lead.png \n" +
+                                            "-tags/" + tagsFolder + "/Lead Bonus.png \n" +
+                                            "-tags/" + tagsFolder + "/Rhythm.png \n" +
+                                            "-tags/" + tagsFolder + "/Rhythm Bonus.png \n" +
+                                            "-tags/" + tagsFolder + "/Custom.png \n" +
+                                            "-tags/" + tagsFolder + "/Vocal.png");
+
+                        }
+                    }
+                }
+            }
         }
 
         private void btnShowPreview_Click(object sender, EventArgs e)
@@ -685,10 +862,6 @@ namespace RSDLCTagger
 
                             using (Graphics gra = Graphics.FromImage(midAlbumArt))
                             {
-                                float deltaPixels = 7;
-                                float xStart = 0f;
-                                float yStart = 5 - deltaPixels;
-
                                 gra.DrawImage(backgroundLayer, 0, 0.5f);
                                 if (vocals)
                                     gra.DrawImage(vocalLayer, 0, 0.5f);
@@ -708,10 +881,9 @@ namespace RSDLCTagger
                             }
 
                             pictureBoxPreview.Image = midAlbumArt;
-
-                            //Clear dirs
-                            Directory.Delete(songExtractedPath, true);
                         }
+                        //Clear dirs
+                        Directory.Delete(songExtractedPath, true);
                     };
                     bgWorker.RunWorkerAsync();
                 }
@@ -739,7 +911,7 @@ namespace RSDLCTagger
         {
             string packName = comboTagPacks.SelectedItem.ToString();
             string packFolder = Path.Combine("tags", packName);
-            string preview = Path.Combine("tags", packName + "prev.png");
+            string preview = Path.Combine("tags", packName + "prev_tagged.png");
             string info = Path.Combine("tags", packName, "info.txt");
 
             if (Directory.Exists(packFolder))
@@ -747,7 +919,9 @@ namespace RSDLCTagger
                 tagsFolder = packFolder.Replace(@"tags\", "");
 
                 if (File.Exists(preview))
-                pictureBoxPreview.Image = Bitmap.FromFile(preview);
+                {
+                    pictureBoxPreview.Image = Bitmap.FromFile(preview);
+                }
 
                 if (File.Exists(info))
                     tbThemeLegend.Text = File.ReadAllText(info);
@@ -761,6 +935,18 @@ namespace RSDLCTagger
                 Image preview = pictureBoxPreview.Image;
                 preview.Save(sfdPreview.FileName);
             }
+        }
+
+        private void dgvSongs_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
+                stopWatch.Start();
+        }
+
+        private void dgvSongs_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
+                stopWatch.Reset();
         }
     }
 }

@@ -33,6 +33,7 @@
             this.sfdPreview = new System.Windows.Forms.SaveFileDialog();
             this.themeContainerMain = new Ambiance.Ambiance_ThemeContainer();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tbThemeLegend = new System.Windows.Forms.TextBox();
             this.btnSavePreview = new Ambiance.Ambiance_Button_1();
             this.lblTagPacks = new Ambiance.Ambiance_Label();
             this.comboTagPacks = new Ambiance.Ambiance_ComboBox();
@@ -61,7 +62,7 @@
             this.colTagged = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ambiance_ControlBox1 = new Ambiance.Ambiance_ControlBox();
-            this.tbThemeLegend = new System.Windows.Forms.TextBox();
+            this.checkOverwriteTagsOnTaggedSongs = new Ambiance.Ambiance_CheckBox();
             this.themeContainerMain.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).BeginInit();
@@ -111,12 +112,21 @@
             this.groupBox2.Controls.Add(this.lblTagPacks);
             this.groupBox2.Controls.Add(this.comboTagPacks);
             this.groupBox2.Controls.Add(this.pictureBoxPreview);
-            this.groupBox2.Location = new System.Drawing.Point(62, 493);
+            this.groupBox2.Location = new System.Drawing.Point(55, 493);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(571, 217);
+            this.groupBox2.Size = new System.Drawing.Size(570, 225);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tag packs";
+            // 
+            // tbThemeLegend
+            // 
+            this.tbThemeLegend.Enabled = false;
+            this.tbThemeLegend.Location = new System.Drawing.Point(25, 108);
+            this.tbThemeLegend.Multiline = true;
+            this.tbThemeLegend.Name = "tbThemeLegend";
+            this.tbThemeLegend.Size = new System.Drawing.Size(299, 103);
+            this.tbThemeLegend.TabIndex = 24;
             // 
             // btnSavePreview
             // 
@@ -165,7 +175,7 @@
             // 
             // pictureBoxPreview
             // 
-            this.pictureBoxPreview.Location = new System.Drawing.Point(378, 40);
+            this.pictureBoxPreview.Location = new System.Drawing.Point(378, 44);
             this.pictureBoxPreview.Name = "pictureBoxPreview";
             this.pictureBoxPreview.Size = new System.Drawing.Size(128, 128);
             this.pictureBoxPreview.TabIndex = 20;
@@ -173,6 +183,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkOverwriteTagsOnTaggedSongs);
             this.groupBox1.Controls.Add(this.checkAddTagsToFileName);
             this.groupBox1.Controls.Add(this.lblWorkingFolderPath);
             this.groupBox1.Controls.Add(this.tbWorkingFolderPath);
@@ -190,8 +201,8 @@
             // 
             this.checkAddTagsToFileName.BackColor = System.Drawing.Color.Transparent;
             this.checkAddTagsToFileName.Checked = false;
-            this.checkAddTagsToFileName.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.checkAddTagsToFileName.Location = new System.Drawing.Point(422, 59);
+            this.checkAddTagsToFileName.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.checkAddTagsToFileName.Location = new System.Drawing.Point(240, 55);
             this.checkAddTagsToFileName.Name = "checkAddTagsToFileName";
             this.checkAddTagsToFileName.Size = new System.Drawing.Size(171, 15);
             this.checkAddTagsToFileName.TabIndex = 21;
@@ -203,7 +214,7 @@
             this.lblWorkingFolderPath.BackColor = System.Drawing.Color.Transparent;
             this.lblWorkingFolderPath.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.lblWorkingFolderPath.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(77)))));
-            this.lblWorkingFolderPath.Location = new System.Drawing.Point(281, 23);
+            this.lblWorkingFolderPath.Location = new System.Drawing.Point(277, 22);
             this.lblWorkingFolderPath.Name = "lblWorkingFolderPath";
             this.lblWorkingFolderPath.Size = new System.Drawing.Size(146, 20);
             this.lblWorkingFolderPath.TabIndex = 20;
@@ -214,7 +225,7 @@
             this.tbWorkingFolderPath.BackColor = System.Drawing.Color.Transparent;
             this.tbWorkingFolderPath.Font = new System.Drawing.Font("Tahoma", 11F);
             this.tbWorkingFolderPath.ForeColor = System.Drawing.Color.DimGray;
-            this.tbWorkingFolderPath.Location = new System.Drawing.Point(429, 19);
+            this.tbWorkingFolderPath.Location = new System.Drawing.Point(429, 18);
             this.tbWorkingFolderPath.MaxLength = 32767;
             this.tbWorkingFolderPath.Multiline = false;
             this.tbWorkingFolderPath.Name = "tbWorkingFolderPath";
@@ -228,8 +239,8 @@
             // 
             this.checkDeleteExtractedOnDone.BackColor = System.Drawing.Color.Transparent;
             this.checkDeleteExtractedOnDone.Checked = false;
-            this.checkDeleteExtractedOnDone.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.checkDeleteExtractedOnDone.Location = new System.Drawing.Point(95, 59);
+            this.checkDeleteExtractedOnDone.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.checkDeleteExtractedOnDone.Location = new System.Drawing.Point(12, 55);
             this.checkDeleteExtractedOnDone.Name = "checkDeleteExtractedOnDone";
             this.checkDeleteExtractedOnDone.Size = new System.Drawing.Size(241, 15);
             this.checkDeleteExtractedOnDone.TabIndex = 18;
@@ -241,7 +252,7 @@
             this.lblRSPath.BackColor = System.Drawing.Color.Transparent;
             this.lblRSPath.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.lblRSPath.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(77)))));
-            this.lblRSPath.Location = new System.Drawing.Point(21, 23);
+            this.lblRSPath.Location = new System.Drawing.Point(21, 22);
             this.lblRSPath.Name = "lblRSPath";
             this.lblRSPath.Size = new System.Drawing.Size(63, 20);
             this.lblRSPath.TabIndex = 17;
@@ -252,7 +263,7 @@
             this.tbRSPath.BackColor = System.Drawing.Color.Transparent;
             this.tbRSPath.Font = new System.Drawing.Font("Tahoma", 11F);
             this.tbRSPath.ForeColor = System.Drawing.Color.DimGray;
-            this.tbRSPath.Location = new System.Drawing.Point(87, 21);
+            this.tbRSPath.Location = new System.Drawing.Point(85, 18);
             this.tbRSPath.MaxLength = 32767;
             this.tbRSPath.Multiline = false;
             this.tbRSPath.Name = "tbRSPath";
@@ -420,6 +431,8 @@
             this.dgvSongs.Size = new System.Drawing.Size(600, 225);
             this.dgvSongs.TabIndex = 3;
             this.dgvSongs.SelectionChanged += new System.EventHandler(this.dgvSongs_SelectionChanged);
+            this.dgvSongs.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgvSongs_KeyDown);
+            this.dgvSongs.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dgvSongs_KeyUp);
             // 
             // colSelect
             // 
@@ -450,14 +463,16 @@
             this.ambiance_ControlBox1.TabIndex = 0;
             this.ambiance_ControlBox1.Text = "ambiance_ControlBox1";
             // 
-            // tbThemeLegend
+            // checkOverwriteTagsOnTaggedSongs
             // 
-            this.tbThemeLegend.Enabled = false;
-            this.tbThemeLegend.Location = new System.Drawing.Point(25, 108);
-            this.tbThemeLegend.Multiline = true;
-            this.tbThemeLegend.Name = "tbThemeLegend";
-            this.tbThemeLegend.Size = new System.Drawing.Size(299, 103);
-            this.tbThemeLegend.TabIndex = 24;
+            this.checkOverwriteTagsOnTaggedSongs.BackColor = System.Drawing.Color.Transparent;
+            this.checkOverwriteTagsOnTaggedSongs.Checked = false;
+            this.checkOverwriteTagsOnTaggedSongs.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.checkOverwriteTagsOnTaggedSongs.Location = new System.Drawing.Point(417, 55);
+            this.checkOverwriteTagsOnTaggedSongs.Name = "checkOverwriteTagsOnTaggedSongs";
+            this.checkOverwriteTagsOnTaggedSongs.Size = new System.Drawing.Size(235, 15);
+            this.checkOverwriteTagsOnTaggedSongs.TabIndex = 22;
+            this.checkOverwriteTagsOnTaggedSongs.Text = "Overwrite tags on tagged songs";
             // 
             // frmMain
             // 
@@ -521,6 +536,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colTagged;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPath;
         private System.Windows.Forms.TextBox tbThemeLegend;
+        private Ambiance.Ambiance_CheckBox checkOverwriteTagsOnTaggedSongs;
     }
 }
 

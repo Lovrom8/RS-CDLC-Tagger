@@ -12,3 +12,17 @@ E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Release\RSDLCTagger.cspr
 E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Release\RSDLCTagger.exe
 E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Release\RSDLCTagger.pdb
 E:\RS2014SongRemoverV1.0.25\MetroUITest\RSDLCTagger\obj\Release\RSDLCTagger.csprojResolveAssemblyReference.cache
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.exe
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.pdb
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\RSDLCTagger.exe
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\RSDLCTagger.pdb
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\Newtonsoft.Json.dll
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\RocksmithToolkitLib.dll
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\X360.dll
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\MiscUtil.dll
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\zlib.net.dll
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\bin\Release\Newtonsoft.Json.xml
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.csprojResolveAssemblyReference.cache
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.frmMain.resources
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.Properties.Resources.resources
+E:\RS2014SongRemoverV1.0.25\RS-CDLC-Tagger\RSDLCTagger\obj\Release\RSDLCTagger.csproj.GenerateResource.Cache
